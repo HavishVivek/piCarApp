@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RC Car — Mission Console</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="console-header">
+    <div class="brand">
+      <span class="brand-mark">◎</span>
+      <div>
+        <h1>RC CAR MISSION CONSOLE</h1>
+        <p class="subtitle">mapping &amp; autonomous route control</p>
+      </div>
+    </div>
+    <!-- One pill, two axes folded together:
+         OFFLINE -> CONNECTED -> IDLE / MAPPING / ROUTING. -->
+    <div class="state-pill is-offline" id="state-pill">
+      <span class="dot"></span><span id="state-label">OFFLINE</span>
+    </div>
+  </header>
+
+  <main class="grid-layout">
+    <section class="panel panel-camera">
+      <h2>Camera <span class="chip" id="model-chip">no model loaded</span></h2>
+      <div class="camera-frame">
+        <video id="video" autoplay playsinline muted></video>
+        <div class="camera-placeholder" id="camera-placeholder">waiting for car…</div>
+        <div class="obstacle-banner hidden" id="obstacle-banner">
+          ⚠ OBSTACLE DETECTED — REROUTING
+        </div>
+      </div>
+      <div class="pantilt-readout" id="pantilt-readout">pan 0° · tilt 0°</div>
+    </section>
+
+    <section class="panel panel-map">
+      <h2>Occupancy Map <span class="hint">click to set a route goal</span></h2>
+      <canvas id="grid-canvas" width="480" height="480"></canvas>
+    </section>
+
+    <section class="panel panel-telemetry">
+      <h2>Telemetry</h2>
+      <dl class="telemetry-list">
+        <dt>Position (x, y)</dt><dd id="tel-pos">0.00, 0.00 m</dd>
+        <dt>Heading</dt><dd id="tel-heading">0.0°</dd>
+        <dt>Ultrasonic</dt><dd id="tel-ultra">-- m</dd>
+        <dt>IR left / right</dt><dd id="tel-ir">clear / clear</dd>
+        <dt>Action</dt><dd id="tel-action">stop</dd>
+      </dl>
+    </section>
+
+    <section class="panel panel-controls">
+      <h2>Mapping</h2>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-map-start">Start mapping</button>
+        <button class="btn btn-danger" id="btn-map-stop">Stop</button>
+        <button class="btn" id="btn-map-download">Download mapping data</button>
+      </div>
+
+      <h2>Model</h2>
+      <div class="btn-row">
+        <input type="file" id="model-file" accept=".zip">
+        <button class="btn" id="btn-model-upload">Upload trained model</button>
+      </div>
+
+      <h2>Autonomous route</h2>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-route-start">Start route (auto goal)</button>
+        <button class="btn btn-danger" id="btn-route-stop">Stop</button>
+      </div>
+      <p class="hint" id="route-hint">Click a free cell on the map, then this button follows that path instead.</p>
+    </section>
+  </main>
+
+  <!-- config.js is generated at build time from the RELAY_URL env var.
+       It sets window.RELAY_URL before app.js runs. -->
+  <script src="/config.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

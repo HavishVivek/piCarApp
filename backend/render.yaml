@@ -1,0 +1,23 @@
+# Render Blueprint for the RC car relay.
+# Deploy: push this repo to GitHub, then in Render pick "New +" -> "Blueprint"
+# and point it at the repo. Render reads this file and provisions the service.
+#
+# Free tier notes:
+#   - The service sleeps after ~15 min idle and takes 30-50s to wake. The first
+#     connection from the Pi or browser after idle will stall briefly, then work.
+#   - One instance only, which is exactly what the single-worker Socket.IO relay
+#     wants — no session affinity to configure.
+services:
+  - type: web
+    name: rc-car-relay
+    runtime: docker
+    plan: free
+    # Health check keeps Render happy and gives you a cheap liveness probe.
+    healthCheckPath: /healthz
+    envVars:
+      # Lock CORS to your Vercel frontend origin. Set this in the Render
+      # dashboard (or here) to your real domain, e.g. https://rc-console.vercel.app
+      - key: FRONTEND_ORIGIN
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true

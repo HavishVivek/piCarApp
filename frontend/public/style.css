@@ -1,0 +1,163 @@
+/* Palette: near-black hull, phosphor green primary signal, amber for
+   alerts/obstacles, cool blue-grey for chrome/structure. Monospace
+   throughout — this is a telemetry console, not a marketing page. */
+:root {
+  --hull: #0a0e0c;
+  --panel: #101512;
+  --panel-edge: #223028;
+  --phosphor: #35e28a;
+  --phosphor-dim: #1c7a4c;
+  --amber: #e2a935;
+  --danger: #e2543a;
+  --ink: #cfe8da;
+  --ink-dim: #6f8b7c;
+  --mono: "JetBrains Mono", "SF Mono", "Fira Code", ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--hull);
+  background-image:
+    linear-gradient(var(--panel-edge) 1px, transparent 1px),
+    linear-gradient(90deg, var(--panel-edge) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: -1px -1px;
+  color: var(--ink);
+  font-family: var(--mono);
+}
+
+.console-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 28px;
+  border-bottom: 1px solid var(--panel-edge);
+}
+.brand { display: flex; align-items: center; gap: 14px; }
+.brand-mark {
+  font-size: 28px;
+  color: var(--phosphor);
+  text-shadow: 0 0 12px var(--phosphor-dim);
+}
+.brand h1 { font-size: 16px; letter-spacing: 0.12em; margin: 0; }
+.subtitle { margin: 2px 0 0; font-size: 11px; color: var(--ink-dim); letter-spacing: 0.06em; }
+
+.state-pill {
+  display: flex; align-items: center; gap: 8px;
+  border: 1px solid var(--panel-edge);
+  padding: 6px 14px; border-radius: 20px;
+  font-size: 12px; letter-spacing: 0.08em;
+}
+.state-pill .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--phosphor); box-shadow: 0 0 8px var(--phosphor);
+}
+
+/* Folded connection/operational states. OFFLINE reads as dead chrome; the
+   moment the car connects the pill lights phosphor and, once it's driving,
+   amber to signal "actively doing something". */
+.state-pill.is-offline { border-color: var(--panel-edge); color: var(--ink-dim); }
+.state-pill.is-offline .dot { background: var(--ink-dim); box-shadow: none; }
+.state-pill.is-connected { border-color: var(--phosphor-dim); color: var(--phosphor); }
+.state-pill.is-active { border-color: var(--amber); color: var(--amber); }
+.state-pill.is-active .dot {
+  background: var(--amber); box-shadow: 0 0 8px var(--amber);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+@keyframes pulse { 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { .state-pill.is-active .dot { animation: none; } }
+
+.grid-layout {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 0.8fr;
+  grid-template-rows: auto auto;
+  gap: 18px;
+  padding: 24px 28px;
+}
+.panel-camera { grid-column: 1; grid-row: 1; }
+.panel-map { grid-column: 2; grid-row: 1 / 3; }
+.panel-telemetry { grid-column: 3; grid-row: 1; }
+.panel-controls { grid-column: 1 / 3; grid-row: 2; }
+
+@media (max-width: 1000px) {
+  .grid-layout { grid-template-columns: 1fr; }
+  .panel-camera, .panel-map, .panel-telemetry, .panel-controls { grid-column: 1; grid-row: auto; }
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  border-radius: 6px;
+  padding: 16px 18px;
+}
+.panel h2 {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  margin: 0 0 12px;
+  display: flex; align-items: center; gap: 10px;
+}
+.chip {
+  font-size: 10px; text-transform: none; letter-spacing: 0;
+  border: 1px solid var(--panel-edge); border-radius: 10px;
+  padding: 2px 8px; color: var(--amber);
+}
+.hint { font-size: 11px; color: var(--ink-dim); font-weight: normal; text-transform: none; }
+
+.camera-frame { position: relative; border: 1px solid var(--panel-edge); border-radius: 4px; overflow: hidden; background: #060907; min-height: 180px; }
+.camera-frame video { width: 100%; display: block; }
+.camera-placeholder {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; letter-spacing: 0.08em; color: var(--ink-dim);
+}
+.camera-placeholder.hidden { display: none; }
+.obstacle-banner {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: rgba(226, 84, 58, 0.9);
+  color: #10120f;
+  text-align: center; font-size: 13px; letter-spacing: 0.06em;
+  padding: 8px; font-weight: 700;
+}
+.hidden { display: none; }
+.pantilt-readout { margin-top: 8px; font-size: 11px; color: var(--ink-dim); }
+
+#grid-canvas {
+  width: 100%; height: auto; aspect-ratio: 1;
+  background: #060907;
+  border: 1px solid var(--panel-edge);
+  cursor: crosshair;
+}
+
+.telemetry-list { margin: 0; }
+.telemetry-list dt { font-size: 10px; color: var(--ink-dim); letter-spacing: 0.08em; margin-top: 10px; }
+.telemetry-list dt:first-child { margin-top: 0; }
+.telemetry-list dd { margin: 2px 0 0; font-size: 18px; color: var(--phosphor); }
+
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; align-items: center; }
+.btn {
+  font-family: var(--mono);
+  background: transparent;
+  border: 1px solid var(--panel-edge);
+  color: var(--ink);
+  padding: 9px 16px;
+  border-radius: 4px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.btn:hover { border-color: var(--phosphor); color: var(--phosphor); }
+.btn-primary { border-color: var(--phosphor-dim); color: var(--phosphor); }
+.btn-primary:hover { background: rgba(53, 226, 138, 0.08); }
+.btn-danger { border-color: var(--danger); color: var(--danger); }
+.btn-danger:hover { background: rgba(226, 84, 58, 0.08); }
+
+input[type="file"] {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-dim);
+}

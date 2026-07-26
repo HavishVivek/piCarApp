@@ -5,8 +5,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
-# Render injects $PORT at runtime (so does Cloud Run). One eventlet worker:
-# Socket.IO needs every client on the same process. On Render's free tier you
-# get a single instance anyway, so there's nothing to shard across — keep -w 1.
+# Render injects $PORT at runtime. One worker: Socket.IO needs every client on
+# the same process. The GeventWebSocketWorker handles the websocket upgrade and
+# is stable on modern Python (the eventlet worker is not). wsgi.py monkey-patches
+# gevent BEFORE importing the app, which the worker requires.
 ENV PORT=10000
-CMD exec gunicorn --worker-class eventlet -w 1 --bind 0.0.0.0:$PORT app:socketio
+CMD exec gunicorn --worker-class geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 --bind 0.0.0.0:$PORT wsgi:application

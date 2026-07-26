@@ -33,7 +33,7 @@ app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "rc-car-relay")
 _origins_env = os.environ.get("FRONTEND_ORIGIN", "*")
 _cors = "*" if _origins_env.strip() == "*" else [o.strip() for o in _origins_env.split(",")]
 
-socketio = SocketIO(app, cors_allowed_origins=_cors, async_mode="eventlet")
+socketio = SocketIO(app, cors_allowed_origins=_cors, async_mode="gevent")
 
 # --- connection bookkeeping ----------------------------------------------
 pi_sid = None                 # socket id of the connected Pi, or None
